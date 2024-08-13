@@ -5,4 +5,5 @@ type UserAccount struct {
 	Username  string
 	Password  string
 	CreatedAt string
+	RefreshToken string
 }

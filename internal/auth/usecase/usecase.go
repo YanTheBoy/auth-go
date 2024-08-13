@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"log"
 
 	"github.com/bogatyr285/auth-go/internal/auth/entity"
 	"github.com/bogatyr285/auth-go/internal/buildinfo"
@@ -12,6 +13,7 @@ import (
 type UserRepository interface {
 	RegisterUser(ctx context.Context, u entity.UserAccount) error
 	FindUserByEmail(ctx context.Context, username string) (entity.UserAccount, error)
+	PutRefreshToken(ctx context.Context, refreshToken, username string) error
 }
 
 type CryptoPassword interface {
@@ -20,7 +22,8 @@ type CryptoPassword interface {
 }
 
 type JWTManager interface {
-	IssueToken(userID string) (string, error)
+	IssueAccessToken(userID string) (string, error)
+	IssueRefreshToken(userID string) (string, error)
 	VerifyToken(tokenString string) (*jwt.Token, error)
 }
 
@@ -57,19 +60,23 @@ func (u AuthUseCase) PostLogin(ctx context.Context, request gen.PostLoginRequest
 		return gen.PostLogin401JSONResponse{Error: "unauth"}, nil
 	}
 
-	token, err := u.jm.IssueToken(user.Username)
+	token, err := u.jm.IssueAccessToken(user.Username)
 	if err != nil {
 		return gen.PostLogin500JSONResponse{}, err
 	}
 
+	refreshToken, err := u.jm.IssueRefreshToken(user.Username)
+	err = u.ur.PutRefreshToken(ctx, refreshToken, request.Body.Username)
 	return gen.PostLogin200JSONResponse{
 		AccessToken: token,
+		RefreshToken: refreshToken,
 	}, nil
 }
 
 func (u AuthUseCase) PostRegister(ctx context.Context, request gen.PostRegisterRequestObject) (gen.PostRegisterResponseObject, error) {
 	hashedPassword, err := u.cp.HashPassword(request.Body.Password)
 	if err != nil {
+		log.Println(err)
 		return gen.PostRegister500JSONResponse{}, nil
 	}
 
@@ -81,6 +88,7 @@ func (u AuthUseCase) PostRegister(ctx context.Context, request gen.PostRegisterR
 
 	err = u.ur.RegisterUser(ctx, user)
 	if err != nil {
+		log.Println(err)
 		return gen.PostRegister500JSONResponse{}, nil
 	}
 	return gen.PostRegister201JSONResponse{

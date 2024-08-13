@@ -23,6 +23,7 @@ func New(dbPath string) (SQLLiteStorage, error) {
 		id INTEGER PRIMARY KEY,
 		username text not null,
 		password text not null,
+		refresh_token text,
 		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP);
 	create index if not exists idx_username ON users(username);
 	`)
@@ -39,6 +40,18 @@ func New(dbPath string) (SQLLiteStorage, error) {
 
 func (s *SQLLiteStorage) Close() error {
 	return s.db.Close()
+}
+
+func (s *SQLLiteStorage) PutRefreshToken(ctx context.Context, username, refreshToken string) error {
+	stmt, err := s.db.PrepareContext(ctx, `UPDATE users SET refresh_token=? WHERE username=?`)
+	if err != nil {
+		return err
+	}
+
+	if _,err = stmt.Exec(refreshToken,username); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (s *SQLLiteStorage) RegisterUser(ctx context.Context, u entity.UserAccount) error {
