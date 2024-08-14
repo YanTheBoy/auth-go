@@ -48,7 +48,7 @@ func (j *JWTManager) IssueAccessToken(userID string) (string, error) {
 		"iss": j.issuer,
 		"sub": userID,
 		"iat": time.Now().Unix(),
-		"exp": time.Now().Add(time.Hour*168).Unix(),
+		"exp": time.Now().Add(j.expiresIn).Unix(),
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodEdDSA, claims)
@@ -65,7 +65,7 @@ func (j *JWTManager) IssueRefreshToken(userID string) (string, error) {
 		"iss": j.issuer,
 		"sub": userID,
 		"iat": time.Now().Unix(),
-		"exp": time.Now().Add(j.expiresIn).Unix(),
+		"exp": time.Now().Add(time.Hour*168).Unix(),
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodEdDSA, claims)
