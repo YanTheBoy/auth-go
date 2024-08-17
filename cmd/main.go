@@ -2,9 +2,8 @@ package main
 
 import (
 	"context"
-	"log"
-
 	"github.com/bogatyr285/auth-go/cmd/commands"
+	"log"
 )
 
 func main() {

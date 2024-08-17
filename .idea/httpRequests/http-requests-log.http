@@ -1,0 +1,135 @@
+POST http://localhost:8081/login
+
+{
+    "username":"qq@qq.qq",
+    "password":"123"
+}
+
+<> 2024-08-14T010535.200.json
+
+###
+
+POST http://localhost:8081/login
+
+{
+    "username":"qq@qq.qq",
+    "password":"123"
+}
+
+<> 2024-08-14T010526.200.json
+
+###
+
+POST http://localhost:8081/register
+
+{
+    "username":"qq@qq.qq",
+    "password":"123"
+}
+
+<> 2024-08-14T010516.201.json
+
+###
+
+POST http://localhost:8081/register
+
+{
+    "username":"qq@qq.qq",
+    "password":"123"
+}
+
+<> 2024-08-14T004346.500.json
+
+###
+
+POST http://localhost:8081/login
+
+{
+    "username":"qq@qq.qq",
+    "password":"123"
+}
+
+<> 2024-08-14T004340.500.json
+
+###
+
+GET http://localhost:8081/build
+
+<> 2024-08-14T004334.404.txt
+
+###
+
+POST http://localhost:8081/register
+
+{
+    "username":"qq@qq.qq",
+    "password":"123"
+}
+
+<> 2024-08-14T004326.500.json
+
+###
+
+POST http://localhost:8081/login
+
+{
+    "username":"qq@qq.qq",
+    "password":"123"
+}
+
+###
+
+POST http://localhost:8081/login
+
+{
+    "username":"qq@qq.qq",
+    "password":"123"
+}
+
+<> 2024-08-13T222059.200.json
+
+###
+
+POST http://localhost:8081/login
+
+{
+    "username":"qq@qq.qq",
+    "password":"123"
+}
+
+<> 2024-08-13T221301.200.json
+
+###
+
+GET http://localhost:8081/build
+
+<> 2024-08-13T221258.404.txt
+
+###
+
+POST http://localhost:8081/login
+
+{
+    "username":"qq@qq.qq",
+    "password":"123"
+}
+
+<> 2024-08-13T221253.200.json
+
+###
+
+POST http://localhost:8081/register
+
+{
+    "username":"qq@qq.qq",
+    "password":"123"
+}
+
+<> 2024-08-13T221247.201.json
+
+###
+
+GET http://localhost:8081/build
+
+###
+

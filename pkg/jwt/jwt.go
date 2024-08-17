@@ -1,7 +1,7 @@
 package jwt
 
 import (
-	"crypto/rsa"
+	"crypto/ed25519"
 	"fmt"
 	"time"
 
@@ -25,13 +25,12 @@ type JWTManager struct {
 }
 
 func NewJWTManager(issuer string, expiresIn time.Duration, publicKey, privateKey []byte) (*JWTManager, error) {
-	pubKey, err := jwt.ParseRSAPublicKeyFromPEM(publicKey)
+	privKey, err := jwt.ParseEdPrivateKeyFromPEM(privateKey)
 	if err != nil {
 		return nil, fmt.Errorf("%w: %s", ErrKeyParsing, err)
 	}
-	// TODO use Ed algs
 
-	privKey, err := jwt.ParseRSAPrivateKeyFromPEM(privateKey)
+	pubKey, err := jwt.ParseEdPublicKeyFromPEM(publicKey)
 	if err != nil {
 		return nil, fmt.Errorf("%w: %s", ErrKeyParsing, err)
 	}
@@ -44,7 +43,7 @@ func NewJWTManager(issuer string, expiresIn time.Duration, publicKey, privateKey
 	}, nil
 }
 
-func (j *JWTManager) IssueToken(userID string) (string, error) {
+func (j *JWTManager) IssueAccessToken(userID string) (string, error) {
 	claims := jwt.MapClaims{
 		"iss": j.issuer,
 		"sub": userID,
@@ -52,9 +51,26 @@ func (j *JWTManager) IssueToken(userID string) (string, error) {
 		"exp": time.Now().Add(j.expiresIn).Unix(),
 	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodRS256, claims)
+	token := jwt.NewWithClaims(jwt.SigningMethodEdDSA, claims)
 
-	signed, err := token.SignedString(j.privateKey.(*rsa.PrivateKey))
+	signed, err := token.SignedString(j.privateKey.(ed25519.PrivateKey))
+	if err != nil {
+		return "", fmt.Errorf("%w: %s", ErrSigning, err)
+	}
+	return signed, nil
+}
+
+func (j *JWTManager) IssueRefreshToken(userID string) (string, error) {
+	claims := jwt.MapClaims{
+		"iss": j.issuer,
+		"sub": userID,
+		"iat": time.Now().Unix(),
+		"exp": time.Now().Add(time.Hour*168).Unix(),
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodEdDSA, claims)
+
+	signed, err := token.SignedString(j.privateKey.(ed25519.PrivateKey))
 	if err != nil {
 		return "", fmt.Errorf("%w: %s", ErrSigning, err)
 	}
@@ -63,7 +79,7 @@ func (j *JWTManager) IssueToken(userID string) (string, error) {
 
 func (j *JWTManager) VerifyToken(tokenString string) (*jwt.Token, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
+		if _, ok := token.Method.(*jwt.SigningMethodEd25519); !ok {
 			return nil, ErrValidation
 		}
 		return j.publicKey, nil

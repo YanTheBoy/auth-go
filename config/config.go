@@ -36,6 +36,7 @@ type JWT struct {
 
 func Parse(s string) (*Config, error) {
 	c := &Config{}
+	s="/Users/Jarvis/Documents/go/ino/auth-go/config.yaml" // hardcode for debug
 	if err := cleanenv.ReadConfig(s, c); err != nil {
 		return nil, err
 	}
@@ -48,6 +49,7 @@ func Parse(s string) (*Config, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	c.JWT.PrivateKey = string(privateKey)
 	c.JWT.PublicKey = string(publicKey)
 

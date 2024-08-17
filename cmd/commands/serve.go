@@ -41,6 +41,7 @@ func NewServeCmd() *cobra.Command {
 			router.Use(middleware.Recoverer)
 
 			cfg, err := config.Parse(configPath)
+
 			if err != nil {
 				return err
 			}
